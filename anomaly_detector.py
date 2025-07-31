@@ -95,11 +95,11 @@ def main():
     st.markdown(
         """
         **How it works**
-        1. **Filtered Ops** keeps only operations whose code is in your reference table.
-        2. **Detailed Reference** expands each pack → operation rule to each client (by join on `code_pack`).
-        3. **Anomaly Detection** finds all operations where:
-           - the client is already subscribed (`date_operation` > `date_souscription`), and
-           - they were charged the _normal_ fee (`Amount`) rather than the pack fee.
+        1. **Filtered Ops** Garde uniquement les codes opération dans la table de référence.
+        2. **Detailed Reference** expansion par package → conditions particulière pour chaque client (Jointure par `code_pack`).
+        3. **Anomaly Detection** trouve les opérations:
+           - Les clients qui sont déjà souscrits au pack (`date_operation` > `date_souscription`), et
+           - Les clients sont facturés par (`Amount`) au lieu du tarif préférentiel.
         """
     )
 
