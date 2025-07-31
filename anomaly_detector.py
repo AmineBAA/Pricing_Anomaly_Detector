@@ -32,7 +32,6 @@ def load_uploaded_dataframe(uploaded_file):
 
 def main():
     st.title("Pricing Dysfunction Detector")
-    st.image("logo_saham.png", use_container_width=False)
 
     # 1) load the reference table (static resource)
     ref_df = load_reference()
