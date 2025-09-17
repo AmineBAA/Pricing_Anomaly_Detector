@@ -11,6 +11,32 @@ Original file is located at
 
 import streamlit as st
 import pandas as pd
+import unicodedata
+
+
+def normalize_code(s: pd.Series, *, uppercase=True, digits_only=False, zfill=None):
+    # dtype "string" gère mieux les NA
+    s = s.astype("string").fillna("")
+    # unicode canonique (évite les surprises Excel/copier-coller)
+    s = s.map(lambda x: unicodedata.normalize("NFKC", x))
+    # espaces/invisibles + trim
+    s = (s.str.replace("\u00A0", " ", regex=False) # espace insécable
+           .str.replace("\u200B", "", regex=False) # zero-width
+           .str.replace(r"\s+", " ", regex=True)
+           .str.strip())
+    # unifier tirets/apostrophes
+    s = (s.str.replace(r"[\u2010-\u2014\u2212]", "-", regex=True)
+           .str.replace(r"[\u2018\u2019\u2032]", "'", regex=True))
+    # nombres devenus floats "123.0" -> "123"
+    s = s.str.replace(r"\.0$", "", regex=True)
+    if digits_only:
+        s = s.str.replace(r"\D+", "", regex=True)
+    if uppercase:
+        s = s.str.upper()
+    if zfill:
+        s = s.str.zfill(zfill)
+    return s
+
 
 @st.cache_data
 def load_reference():
@@ -57,11 +83,20 @@ def main():
     st.subheader("Equipment")
     st.dataframe(eq_df.head())
 
-    # --- Step 1: filter Operations to only those codes in the reference
+    # --- Step 0: créer une clé nettoyée dans les deux tables
+    ops_df["code_key"] = normalize_code(ops_df["code_operation"])
+    ref_df["code_key"] = normalize_code(ref_df["code_operation"])
+
+   
+    # --- Step 1: filtrage fiable avec la clé nettoyée
     st.header("1️⃣ Filter Operations for Audit")
-    ops_restricted = ops_df[ops_df["code_operation"].isin(ref_df["code_operation"])]
+
+    ref_keys = ref_df["code_key"].dropna().drop_duplicates()
+    ops_restricted = ops_df[ops_df["code_key"].isin(ref_keys)]
+
     st.write(f"Operations matching reference: **{len(ops_restricted)}** rows")
     st.dataframe(ops_restricted)
+
 
     # --- Step 2: build a detailed reference per client
     st.header("2️⃣ Build Detailed Reference per Client")
