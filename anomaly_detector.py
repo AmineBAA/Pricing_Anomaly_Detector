@@ -59,8 +59,6 @@ def main():
 
     # --- Step 1: filter Operations to only those codes in the reference
     st.header("1️⃣ Filter Operations for Audit")
-    ops_df["code_operation"]=ops_df["code_operation"].astype(str)
-    ref_df["code_operation"]=ref_df["code_operation"].astype(str)
     ops_restricted = ops_df[ops_df["code_operation"].isin(ref_df["code_operation"])]
     st.write(f"Operations matching reference: **{len(ops_restricted)}** rows")
     st.dataframe(ops_restricted)
