@@ -26,9 +26,9 @@ def load_reference():
 def load_uploaded_dataframe(uploaded_file):
     """Helper to read either Excel or CSV into a DataFrame."""
     if uploaded_file.name.lower().endswith(".csv"):
-        return pd.read_csv(uploaded_file)
+        return pd.read_csv(uploaded_file,dtype={"code_client":str)})
     else:
-        return pd.read_excel(uploaded_file)
+        return pd.read_excel(uploaded_file,dtype={"code_client":str)})
 
 
 def main():
@@ -87,6 +87,7 @@ def main():
     detected["date_operation"]    = pd.to_datetime(detected["date_operation"])
     detected["date_souscription"] = pd.to_datetime(detected["date_souscription"])
     # only keep those after the pack subscription date
+    detected["code_client"]=detected["code_client"].astype(str)
     anomalies = detected[ detected["date_operation"] > detected["date_souscription"] ]
 
     if anomalies.empty:
