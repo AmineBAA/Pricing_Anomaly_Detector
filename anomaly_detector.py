@@ -26,9 +26,9 @@ def load_reference():
 def load_uploaded_dataframe(uploaded_file):
     """Helper to read either Excel or CSV into a DataFrame."""
     if uploaded_file.name.lower().endswith(".csv"):
-        return pd.read_csv(uploaded_file,dtype={"code_client":str})
+        return pd.read_csv(uploaded_file,dtype={"id_hash":str})
     else:
-        return pd.read_excel(uploaded_file,dtype={"code_client":str})
+        return pd.read_excel(uploaded_file,dtype={"id_hash":str})
 
 
 def main():
@@ -70,24 +70,24 @@ def main():
     ref_client = (
         eq_df
         .merge(ref_df, on="code_pack", how="inner")
-        .loc[:, ["code_client","code_pack","date_souscription","code_operation","Amount_pack","Amount"]]
+        .loc[:, ["id_hash","code_pack","date_souscription","code_operation","Amount_pack","Amount"]]
     )
     st.write(f"Reference × Client rows: **{len(ref_client)}**")
     st.dataframe(ref_client)
 
     # --- Step 3: match & detect anomalies
     st.header("3️⃣ Match & Detect Anomalies")
-    # merge on (code_client, code_operation, Amount) → these are ops charged the *normal* fee
+    # merge on (id_hash, code_operation, Amount) → these are ops charged the *normal* fee
     detected = ops_restricted.merge(
         ref_client,
-        on=["code_client","code_operation","Amount"],
+        on=["id_hash","code_operation","Amount"],
         how="inner"
     )
     # cast dates
     detected["date_operation"]    = pd.to_datetime(detected["date_operation"])
     detected["date_souscription"] = pd.to_datetime(detected["date_souscription"])
     # only keep those after the pack subscription date
-    detected["code_client"]=detected["code_client"].astype(str)
+    detected["id_hash"]=detected["id_hash"].astype(str)
     anomalies = detected[ detected["date_operation"] > detected["date_souscription"] ]
 
     if anomalies.empty:
