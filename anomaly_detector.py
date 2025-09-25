@@ -38,6 +38,7 @@ def main():
     # 1) load the reference table (static resource)
     ref_df = load_reference()
     st.sidebar.markdown(f"**Reference loaded:** {len(ref_df)} rows")
+    ref_df["code_pack"]=ref_df["code_pack"].astype(str)
 
     # 2) let the user upload their Operations and Equipment tables
     op_file = st.sidebar.file_uploader("Upload Operations table", type=["xlsx","csv"])
@@ -50,6 +51,7 @@ def main():
     # read user tables
     ops_df = load_uploaded_dataframe(op_file)
     eq_df  = load_uploaded_dataframe(eq_file)
+    eq_df["code_pack"]=eq_df["code_pack"].astype(str)
 
     # Show raw uploads
     st.header("🔎 Uploaded Data Preview")
