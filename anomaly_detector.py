@@ -20,7 +20,7 @@ def load_reference():
       – Amount_pack  : fee when operation is covered by the pack
       – Amount       : normal fee outside the pack
     """
-    return pd.read_excel("References.xlsx")
+    return pd.read_excel("\\srv-ress-doc\Marketing-DATA\Marketing-Pilotage-Retail\Prelevements.xlsx")
 
 
 def load_uploaded_dataframe(uploaded_file):
